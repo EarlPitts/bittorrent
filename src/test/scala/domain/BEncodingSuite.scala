@@ -28,7 +28,7 @@ yield key ++ value
 
 val bDictGen: Gen[String] =
   Gen
-    .nonEmptyListOf(pairGen)
+    .listOfN(5, pairGen) // Limit the size to 5, otherwise it can take a long time
     .map("d" ++ _.mkString ++ "e")
 
 object BEncodingSuite extends SimpleIOSuite with Checkers:
