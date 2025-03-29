@@ -12,16 +12,16 @@ import BEnconding.*
 type KeyValue = (String, BEnconding)
 
 enum BEnconding:
-  case BInteger(value: Int)
+  case BInteger(value: Long)
   case BString(value: String)
   case BDict(value: Map[String, BEnconding])
   case BList(value: List[BEnconding])
 
-val pInt: Parsley[Int] =
-  some(digit).map(_.mkString.toInt)
+val pInt: Parsley[Long] =
+  some(digit).map(_.mkString.toLong)
 
 val pString: Parsley[String] = for
-  length <- pInt
+  length <- pInt.map(_.toInt)
   _ <- char(':')
   // str <- exactly(length, item).map(_.mkString)
   // TODO exactly/replicateA should be stack-safe
