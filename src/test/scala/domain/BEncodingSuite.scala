@@ -16,6 +16,21 @@ val bIntGen: Gen[String] =
 val bStringGen: Gen[String] =
   Gen.alphaStr.map(s => s"${s.size}:${s}")
 
+val bListGen: Gen[String] =
+  Gen
+    .nonEmptyListOf(Gen.oneOf(bStringGen, bIntGen))
+    .map("l" ++ _.mkString ++ "e")
+
+val pairGen: Gen[String] = for
+  key <- bStringGen
+  value <- Gen.oneOf(bStringGen, bIntGen, bListGen)
+yield key ++ value
+
+val bDictGen: Gen[String] =
+  Gen
+    .nonEmptyListOf(pairGen)
+    .map("d" ++ _.mkString ++ "e")
+
 object BEncodingSuite extends SimpleIOSuite with Checkers:
 
   pureTest("Basic parsing"):
@@ -46,6 +61,11 @@ object BEncodingSuite extends SimpleIOSuite with Checkers:
     }
 
   test("list parsing"):
-    forall(bStringGen) { str =>
+    forall(bListGen) { str =>
+      expect(p.parse(str).isSuccess)
+    }
+
+  test("dictionary parsing"):
+    forall(bDictGen) { str =>
       expect(p.parse(str).isSuccess)
     }
